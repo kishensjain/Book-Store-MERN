@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import Book, { IBook } from "../models/book.model.js";
 import mongoose from "mongoose";
+import cloudinary from "../config/cloudinary.js";
 
 export const getAllBooks = async (req: Request, res: Response) => {
   try {
@@ -29,9 +30,42 @@ export const getBookById = async (req: Request, res: Response) => {
     }
 };
 
-export const createBook = async (req: Request, res: Response) => {};
+export const createBook = async (req: Request, res: Response) => {
 
-export const updateBook = async (req: Request, res: Response) => {};
+    const { title, description, author, publishedDate, genre, price, stock, coverImage } = req.body;
+    if(!title || !description || !author || !genre || price == null || stock == null){
+        return res.status(400).json({message: "Missing required fields"});
+    }
+    try{
+        // Upload to Cloudinary
+
+        let cloudinaryUrl = null
+        if(coverImage){
+            cloudinaryUrl = await cloudinary.uploader.upload(coverImage, {folder: "book_covers"}) 
+        }
+
+        const newBook = await Book.create({
+            title,
+            description,
+            author,
+            publishedDate,
+            genre,
+            price,
+            stock,
+            coverImage: cloudinaryUrl?.secure_url
+        })
+        
+        res.status(201).json(newBook);
+        
+    }catch(error){
+        console.error("Error in createBook controller", error);
+        res.status(500).json({message: "Error creating book"});
+    }
+};
+
+export const updateBook = async (req: Request, res: Response) => {
+
+};
 
 export const deleteBook = async (req: Request, res: Response) => {
     const { id } = req.params;

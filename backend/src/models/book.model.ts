@@ -17,6 +17,7 @@ const bookSchema = new mongoose.Schema(
     description: { type: String, required: true },
     author: { type: String, required: true },
     publishedDate: { type: Date },
+    pages : { type: Number, min: 1 },
     genre: { type: String, required: true },
     price: { type: Number, required: true, min: 0 },
     stock: { type: Number, required: true, default: 0, min: 0 },
