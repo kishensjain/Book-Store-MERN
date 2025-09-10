@@ -7,6 +7,7 @@ const router = express.Router();
 router.get("/", getAllBooks);
 router.get("/:id", getBookById);
 
+
 router.post("/createBook", authMiddleware,adminRoute, createBook);
 
 router.put("/updateBook/:id", authMiddleware,adminRoute, updateBook);

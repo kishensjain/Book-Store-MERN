@@ -31,26 +31,19 @@ export const getBookById = async (req: Request, res: Response) => {
 };
 
 export const createBook = async (req: Request, res: Response) => {
-  const {
-    title,
-    description,
-    author,
-    publishedDate,
-    genre,
-    price,
-    stock,
-    coverImage,
-  } = req.body;
-  if (
-    !title ||
-    !description ||
-    !author ||
-    !genre ||
-    price == null ||
-    stock == null
-  ) {
+  const {title,description,author,publishedDate, genre,price,stock,coverImage,} = req.body;
+  console.log(req.body);
+  if (!title ||!description ||!author ||!genre ||price == null ||stock == null) {
     return res.status(400).json({ message: "Missing required fields" });
   }
+  //genre is an array, so need to seperate by commas as genre will come as string
+  let genreArray : string[];
+  if(typeof genre === "string"){
+    genreArray = genre.split(",").map((g:string) => g.trim());
+  } else {
+    genreArray = genre;
+  }
+
   try {
     // Upload to Cloudinary
 
@@ -66,7 +59,7 @@ export const createBook = async (req: Request, res: Response) => {
       description,
       author,
       publishedDate,
-      genre,
+      genre : genreArray,
       price,
       stock,
       coverImage: cloudinaryUrl?.secure_url,
@@ -97,13 +90,20 @@ export const updateBook = async (req: Request, res: Response) => {
     coverImage,
   } = req.body;
 
+  let genreArray : string[];
+  if(typeof genre === "string"){
+    genreArray = genre.split(",").map((g:string) => g.trim());
+  } else {
+    genreArray = genre;
+  }
+
   try {
     let updateData: Partial<IBook> = {
       title,
       description,
       author,
       publishedDate,
-      genre,
+      genre: genreArray,
       price,
       stock,
     };
