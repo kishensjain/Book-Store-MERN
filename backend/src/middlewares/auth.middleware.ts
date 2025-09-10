@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import User from "../models/user.model.js";
-interface AuthRequest extends Request {
+export interface AuthRequest extends Request {
   user?: {
     // req may have a "user" object
     role: string; // user has at least a "role" property

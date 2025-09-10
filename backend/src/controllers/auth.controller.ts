@@ -1,7 +1,8 @@
 import { Request, Response } from "express";
 import User, { IUser } from "../models/user.model.js";
-import jwt from "jsonwebtoken";
+import jwt, { JwtPayload } from "jsonwebtoken";
 import { redis } from "../config/redis.js";
+import { AuthRequest } from "../middlewares/auth.middleware.js";
 
 const generateTokens = (id: string): { accessToken: string; refreshToken: string } => {
   const accessToken = jwt.sign(
@@ -119,4 +120,51 @@ export const logoutUser = async (req: Request, res: Response) => {
   }
 }
 
-//TODO : refresh access token
+export const refreshAccessToken = async (req: Request, res: Response) => {
+  try{
+    const refreshToken = req.cookies.refreshToken;
+    if(!refreshToken){
+      return res.status(401).json({ message: "No refresh token provided" });
+    }
+
+    const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string) as JwtPayload;
+
+    if(!decoded || !decoded.id){
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const storedToken = await redis.get(`refreshToken:${(decoded as any).id}`);
+    if(storedToken !== refreshToken){
+      res.clearCookie("accessToken");
+      res.clearCookie("refreshToken");
+      return res.status(403).json({ message: "Invalid refresh token" });
+    }
+
+    const accessToken = jwt.sign({ id: (decoded as any).id }, process.env.ACCESS_TOKEN_SECRET as string, { expiresIn: '15m' });
+
+    res.cookie("accessToken",accessToken,{
+      httpOnly:true,
+      secure:process.env.NODE_ENV === "production",
+      sameSite:"strict",
+      maxAge:15 * 60 * 1000 //15 minutes
+    });
+
+    res.status(200).json({message:"Access token refreshed", accessToken});
+
+  } catch (error:any) {
+    if (error.name === "TokenExpiredError") {
+      return res.status(401).json({ message: "Refresh token expired" });
+    }
+    console.error("Error in refreshAccessToken controller", error);
+    res.status(500).json({ message: error.message });
+  }
+}
+
+export const getUserProfile = async (req: AuthRequest, res: Response) => {
+  try {
+    res.json(req.user);
+  }catch (error:any) {
+    console.error("Error in getUserProfile controller", error);
+    res.status(500).json({ message: error.message });
+  }
+}
