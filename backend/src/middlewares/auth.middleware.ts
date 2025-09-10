@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from 'express';
 
 interface AuthRequest extends Request {
-  user?: {                // 👈 we are saying: req may have a "user" object
-    role: string;         // 👈 that user has at least a "role" property
-    [key: string]: any;   // 👈 and it may also have other properties (like id, email, etc.)
+  user?: {                // req may have a "user" object
+    role: string;         // user has at least a "role" property
+    [key: string]: any;   // may also have other properties (like id, email, etc.)
   };
 }
 
