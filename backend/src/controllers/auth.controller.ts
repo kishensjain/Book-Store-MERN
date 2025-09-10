@@ -82,8 +82,10 @@ export const loginUser = async (req: Request, res: Response) => {
     const user = await User.findOne({ email });
     if (user && (await user.comparePassword(password))) {
       const { accessToken, refreshToken } = generateTokens(String(user._id));
+
       await storeRefreshToken(String(user._id), refreshToken);
       setCookies(res, accessToken, refreshToken);
+
       res.status(201).json({
         _id: user._id,
         name: user.name,
@@ -108,6 +110,7 @@ export const logoutUser = async (req: Request, res: Response) => {
       const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string);
       await redis.del(`refreshToken:${(decoded as any).id}`);
     }
+    
     res.clearCookie("accessToken");
 		res.clearCookie("refreshToken");
 		res.status(200).json({ message: "Logged out successfully" });
