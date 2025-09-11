@@ -2,11 +2,6 @@ import { Request, Response } from "express";
 import Book, { IBook } from "../models/book.model.js";
 import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
-
-export interface MulterRequest extends Request {
-  file?: Express.Multer.File;
-}
-
 export const getAllBooks = async (req: Request, res: Response) => {
   try {
     const books: IBook[] = await Book.find({});
@@ -34,7 +29,7 @@ export const getBookById = async (req: Request, res: Response) => {
   }
 };
 
-export const createBook = async (req: MulterRequest, res: Response) => {
+export const createBook = async (req: Request, res: Response) => {
   const { title, description, author, publishedDate, genre, price, stock } = req.body;
 
   if (!title || !description || !author || !genre || price == null || stock == null) {
@@ -79,7 +74,7 @@ export const createBook = async (req: MulterRequest, res: Response) => {
 };
 
 
-export const updateBook = async (req: MulterRequest, res: Response) => {
+export const updateBook = async (req: Request, res: Response) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
