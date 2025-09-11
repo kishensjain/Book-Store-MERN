@@ -3,6 +3,10 @@ import Book, { IBook } from "../models/book.model.js";
 import mongoose from "mongoose";
 import cloudinary from "../config/cloudinary.js";
 
+export interface MulterRequest extends Request {
+  file?: Express.Multer.File;
+}
+
 export const getAllBooks = async (req: Request, res: Response) => {
   try {
     const books: IBook[] = await Book.find({});
@@ -30,27 +34,29 @@ export const getBookById = async (req: Request, res: Response) => {
   }
 };
 
-export const createBook = async (req: Request, res: Response) => {
-  const {title,description,author,publishedDate, genre,price,stock,coverImage,} = req.body;
-  console.log(req.body);
-  if (!title ||!description ||!author ||!genre ||price == null ||stock == null) {
+export const createBook = async (req: MulterRequest, res: Response) => {
+  const { title, description, author, publishedDate, genre, price, stock } = req.body;
+
+  if (!title || !description || !author || !genre || price == null || stock == null) {
     return res.status(400).json({ message: "Missing required fields" });
   }
-  //genre is an array, so need to seperate by commas as genre will come as string
-  let genreArray : string[];
-  if(typeof genre === "string"){
-    genreArray = genre.split(",").map((g:string) => g.trim());
-  } else {
-    genreArray = genre;
-  }
+
+  // Convert genre string to array if necessary
+  const genreArray = typeof genre === "string" ? genre.split(",").map(g => g.trim()) : genre;
 
   try {
-    // Upload to Cloudinary
+    let coverImageUrl: string | undefined;
 
-    let cloudinaryUrl = null;
-    if (coverImage) {
-      cloudinaryUrl = await cloudinary.uploader.upload(coverImage, {
-        folder: "book_covers",
+    if (req.file) {
+      coverImageUrl = await new Promise<string>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "book_covers" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result?.secure_url as string);
+          }
+        );
+        stream.end(req.file?.buffer);
       });
     }
 
@@ -59,10 +65,10 @@ export const createBook = async (req: Request, res: Response) => {
       description,
       author,
       publishedDate,
-      genre : genreArray,
+      genre: genreArray,
       price,
       stock,
-      coverImage: cloudinaryUrl?.secure_url,
+      coverImage: coverImageUrl,
     });
 
     res.status(201).json(newBook);
@@ -72,23 +78,15 @@ export const createBook = async (req: Request, res: Response) => {
   }
 };
 
-export const updateBook = async (req: Request, res: Response) => {
+
+export const updateBook = async (req: MulterRequest, res: Response) => {
   const { id } = req.params;
 
   if (!mongoose.Types.ObjectId.isValid(id)) {
     return res.status(400).json({ message: "Invalid book ID" });
   }
 
-  const {
-    title,
-    description,
-    author,
-    publishedDate,
-    genre,
-    price,
-    stock,
-    coverImage,
-  } = req.body;
+  const {title,description,author,publishedDate,genre, price,stock} = req.body;
 
   let genreArray : string[];
   if(typeof genre === "string"){
@@ -98,22 +96,21 @@ export const updateBook = async (req: Request, res: Response) => {
   }
 
   try {
-    let updateData: Partial<IBook> = {
-      title,
-      description,
-      author,
-      publishedDate,
-      genre: genreArray,
-      price,
-      stock,
-    };
+    let updateData: Partial<IBook> = { title, description,author, publishedDate,genre:genreArray,price,stock};
 
     // If coverImage is provided, upload to Cloudinary
-    if (coverImage) {
-      const cloudinaryUrl = await cloudinary.uploader.upload(coverImage, {
-        folder: "book_covers",
+    if (req.file?.buffer) {
+      const cloudinaryUrl = await new Promise<string>((resolve, reject) => {
+        const stream = cloudinary.uploader.upload_stream(
+          { folder: "book_covers" },
+          (error, result) => {
+            if (error) reject(error);
+            else resolve(result?.secure_url as string);
+          }
+        );
+        stream.end(req.file?.buffer);
       });
-      updateData.coverImage = cloudinaryUrl.secure_url;
+      updateData.coverImage = cloudinaryUrl;
     }
 
     const updatedBook = await Book.findByIdAndUpdate(id, updateData, {
