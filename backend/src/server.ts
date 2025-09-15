@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 
 import authRoutes from './routes/auth.routes.js';
 import bookRoutes from './routes/book.routes.js';
+import cartRoutes from './routes/cart.routes.js';
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -18,6 +19,7 @@ app.use(cookieParser());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/books/", bookRoutes);
+app.use("/api/cart/", cartRoutes)
 
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
