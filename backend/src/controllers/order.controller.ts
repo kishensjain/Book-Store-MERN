@@ -48,13 +48,16 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
     await order.save();
 
     // Deduct stock
-    for (const item of cart.items) {
-      const book = await Book.findById(item.book._id);
-      if (book) {
-        book.stock -= item.quantity;
-        await book.save();
-      }
+    const bulkOps = cart.items.map(item => ({
+        updateOne: {
+        filter: { _id: item.book._id },
+        update: { $inc: { stock: -item.quantity } }
     }
+    }));
+
+    // Execute all at once
+    await Book.bulkWrite(bulkOps);
+
 
     // Clear cart
     cart.items.splice(0, cart.items.length); // clears the array
