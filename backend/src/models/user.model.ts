@@ -1,11 +1,13 @@
 import mongoose, { Model } from "mongoose";
 import bcrypt from "bcryptjs";
 
+export type UserRole = "user" | "admin";
 export interface IUser extends mongoose.Document {
   name: string;
   email: string;
   password: string;
   isAdmin: boolean;
+  role: UserRole;
   comparePassword(password: string): Promise<boolean>;
 }
 

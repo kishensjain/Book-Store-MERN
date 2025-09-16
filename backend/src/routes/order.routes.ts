@@ -9,9 +9,9 @@ import { adminRoute, authMiddleware } from '../middlewares/auth.middleware.js';
 router.post('/', authMiddleware, createOrder);
 router.get('/', authMiddleware, getAllOrders);
 router.get('/my-orders', authMiddleware, getUserOrders);
-router.get('/:id', authMiddleware,adminRoute, getOrderById);
-router.put('/:id/status', authMiddleware,adminRoute, updateOrderStatus);
-router.put('/:id/payment', authMiddleware, updatePaymentStatus);
-router.put('/:id/cancel', authMiddleware, cancelOrder);
+router.get('/:orderId', authMiddleware,adminRoute, getOrderById);
+router.put('/:orderId/status', authMiddleware,adminRoute, updateOrderStatus);
+router.put('/:orderId/payment', authMiddleware, updatePaymentStatus);
+router.put('/:orderId/cancel', authMiddleware, cancelOrder);
 
 export default router;
