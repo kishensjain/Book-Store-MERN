@@ -4,6 +4,7 @@ export type OrderStatus = "pending" | "processing" | "shipped" | "delivered" | "
 export type PaymentStatus = "pending" | "completed" | "failed";
 
 export interface IOrder extends mongoose.Document {
+  _id: mongoose.Types.ObjectId;
   user: mongoose.Types.ObjectId;
   items: {
     book: mongoose.Types.ObjectId;
@@ -14,6 +15,7 @@ export interface IOrder extends mongoose.Document {
   status: OrderStatus;
   shippingAddress: string;
   paymentStatus: PaymentStatus;
+  razorpayOrderId?: string; 
 }
 
 const orderSchema = new mongoose.Schema(
@@ -61,12 +63,19 @@ const orderSchema = new mongoose.Schema(
       enum: ["pending", "completed", "failed"],
       default: "pending",
     },
+    razorpayOrderId: {
+      type: String,
+      required: false,
+    },
   },
   { timestamps: true }
 );
 
-orderSchema.pre<IOrder>("save", function (next) {
-  this.totalAmount = this.items.reduce((acc, item) => acc + item.quantity * item.price, 0);
+orderSchema.pre("save", function (next) {
+  this.totalAmount = this.items.reduce(
+    (acc, item) => acc + item.quantity * item.price,
+    0
+  );
   next();
 });
 
