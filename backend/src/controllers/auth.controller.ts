@@ -168,3 +168,38 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 }
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const { token } = req.query; // frontend will send ?token=...
+
+    if (!token) {
+      return res.status(400).json({ message: "Missing token" });
+    }
+
+    // Verify token
+    const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string) as {
+      id: string;
+      email: string;
+    };
+
+    // Find user
+    const user = await User.findById(decoded.id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.isVerified) {
+      return res.status(200).json({ message: "Email already verified" });
+    }
+
+    // Update user
+    user.isVerified = true;
+    await user.save();
+
+    return res.status(200).json({ success: true, message: "Email verified successfully" });
+  } catch (error) {
+    console.error("Error in verifyEmail:", error);
+    return res.status(400).json({ message: "Invalid or expired token" });
+  }
+};

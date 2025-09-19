@@ -8,6 +8,7 @@ export interface IUser extends mongoose.Document {
   password: string;
   isAdmin: boolean;
   role: UserRole;
+  isVerified: boolean;
   comparePassword(password: string): Promise<boolean>;
 }
 
@@ -28,6 +29,10 @@ const userSchema = new mongoose.Schema(
       type: String,
       required: [true, "Password is required"],
       minlength: [6, "Password must be at least 6 characters long"],
+    },
+    isVerified: {
+      type: Boolean,
+      default: false,
     },
     isAdmin: {
       type: Boolean,
