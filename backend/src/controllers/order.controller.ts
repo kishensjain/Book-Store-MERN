@@ -3,6 +3,8 @@ import { AuthRequest } from "../middlewares/auth.middleware.js";
 import Cart from "../models/cart.model.js";
 import Order from "../models/order.model.js";
 import Book from "../models/book.model.js";
+import User from "../models/user.model.js";
+import { sendEmail } from "../config/sendEmail.js";
 
 // 1. Create Order (checkout)
 
@@ -68,6 +70,21 @@ export const createOrder = async (req: AuthRequest, res: Response) => {
       "items.book",
       "title author price"
     );
+
+    // Send order confirmation email
+    const user = await User.findById(userId);
+    if (user) {
+      await sendEmail({
+        to: user.email,
+        subject: `Order #${order._id} Confirmation`,
+        html: `<h2>Thank you for your order, ${user.name}!</h2>
+         <p>Order ID: ${order._id}</p>
+         <p>Total Amount: ₹${order.totalAmount}</p>
+         <p>Shipping Address: ${order.shippingAddress}</p>
+         <p>We will notify you when your order is shipped.</p>`
+});
+
+    }
 
     return res.status(201).json(populatedOrder);
   } catch (error) {
