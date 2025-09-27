@@ -70,7 +70,7 @@ export const registerUser = async (req: Request, res: Response) => {
       html: `<h2>Welcome ${user.name}!</h2>
       <p>Click below to verify your email:</p>
       <a href="${process.env.FRONTEND_URL}/verify-email?token=${token}">Verify Email</a>`
-});
+    });
 
     const { accessToken, refreshToken } = generateTokens(String(user._id));
 		await storeRefreshToken(String(user._id), refreshToken);
