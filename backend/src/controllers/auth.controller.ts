@@ -3,7 +3,6 @@ import User, { IUser } from "../models/user.model.js";
 import jwt, { JwtPayload } from "jsonwebtoken";
 import { redis } from "../config/redis.js";
 import { AuthRequest } from "../middlewares/auth.middleware.js";
-import { sendEmail } from "../config/sendEmail.js"
 const generateTokens = (id: string): { accessToken: string; refreshToken: string } => {
   const accessToken = jwt.sign(
     { id },
@@ -55,22 +54,6 @@ export const registerUser = async (req: Request, res: Response) => {
 
     //create new user
     const user = (await User.create({ name, email, password })) as IUser;
-
-    // Generate JWT verification token
-    const token = jwt.sign(
-      { id: user._id, email: user.email },
-      process.env.JWT_SECRET as string,
-      { expiresIn: "1h" }
-    );
-
-    // Send verification email
-    await sendEmail({
-      to: user.email,
-      subject: "Verify Your Email",
-      html: `<h2>Welcome ${user.name}!</h2>
-      <p>Click below to verify your email:</p>
-      <a href="${process.env.FRONTEND_URL}/verify-email?token=${token}">Verify Email</a>`
-    });
 
     const { accessToken, refreshToken } = generateTokens(String(user._id));
 		await storeRefreshToken(String(user._id), refreshToken);
@@ -184,38 +167,3 @@ export const getUserProfile = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ message: error.message });
   }
 }
-
-export const verifyEmail = async (req: Request, res: Response) => {
-  try {
-    const { token } = req.query; // frontend will send ?token=...
-
-    if (!token) {
-      return res.status(400).json({ message: "Missing token" });
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token as string, process.env.JWT_SECRET as string) as {
-      id: string;
-      email: string;
-    };
-
-    // Find user
-    const user = await User.findById(decoded.id);
-    if (!user) {
-      return res.status(404).json({ message: "User not found" });
-    }
-
-    if (user.isVerified) {
-      return res.status(200).json({ message: "Email already verified" });
-    }
-
-    // Update user
-    user.isVerified = true;
-    await user.save();
-
-    return res.status(200).json({ success: true, message: "Email verified successfully" });
-  } catch (error) {
-    console.error("Error in verifyEmail:", error);
-    return res.status(400).json({ message: "Invalid or expired token" });
-  }
-};
