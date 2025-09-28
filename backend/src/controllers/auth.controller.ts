@@ -56,7 +56,7 @@ export const registerUser = async (req: Request, res: Response) => {
     const user = (await User.create({ name, email, password })) as IUser;
 
     const { accessToken, refreshToken } = generateTokens(String(user._id));
-		await storeRefreshToken(String(user._id), refreshToken);
+		await storeRefreshToken(String(user._id), refreshToken); //stores in redis
 
     setCookies(res, accessToken, refreshToken);
 
