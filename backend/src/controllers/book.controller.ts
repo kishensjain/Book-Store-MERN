@@ -90,35 +90,45 @@ export const updateBook = async (req: Request, res: Response) => {
     genreArray = genre;
   }
 
-  try {
-    let updateData: Partial<IBook> = { title, description,author, publishedDate,genre:genreArray,price,stock};
+  try{
+    const book = await Book.findById(id);
+    if(!book) return res.status(404).json({message:"Book not found"});
 
-    // If coverImage is provided, upload to Cloudinary
-    if (req.file?.buffer) {
-      const cloudinaryUrl = await new Promise<string>((resolve, reject) => {
+    if(req.file?.buffer){
+      if(book.coverImage?.public_id){
+        await cloudinary.uploader.destroy(book.coverImage.public_id);
+      }
+      
+      //upload new image
+      const result = await new Promise<any>((resolve,reject)=>{
         const stream = cloudinary.uploader.upload_stream(
-          { folder: "book_covers" },
-          (error, result) => {
-            if (error) reject(error);
-            else resolve(result?.secure_url as string);
+          {folder:"book_covers"},
+          (error, result) =>{
+            if(error) reject(error);
+            else resolve(result);
           }
         );
         stream.end(req.file?.buffer);
       });
-      updateData.coverImage = cloudinaryUrl;
+
+      book.coverImage = {
+        url : result.secure_url,
+        public_id:result.public_id
+      };
     }
 
-    const updatedBook = await Book.findByIdAndUpdate(id, updateData, {
-      new: true, // return updated document
-      runValidators: true, // apply schema validations
-    });
+    // Update other fields
+    book.title = title || book.title;
+    book.description = description || book.description;
+    book.author = author || book.author;
+    book.publishedDate = publishedDate || book.publishedDate;
+    book.genre = genreArray || book.genre;
+    book.price = price || book.price;
+    book.stock = stock || book.stock;
 
-    if (!updatedBook) {
-      return res.status(404).json({ message: "Book not found" });
-    }
-
-    res.status(200).json(updatedBook);
-  } catch (error) {
+    await book.save();
+    res.status(200).json(book);
+  }catch (error) {
     console.error("Error in updateBook controller", error);
     res.status(500).json({ message: "Error updating book" });
   }
@@ -134,6 +144,12 @@ export const deleteBook = async (req: Request, res: Response) => {
     if (!book) {
       return res.status(404).json({ message: "Book not found" });
     }
+    // Delete cover image from Cloudinary
+    if (book.coverImage?.public_id) {
+      await cloudinary.uploader.destroy(book.coverImage.public_id);
+    }
+
+    await book.deleteOne();
     res.status(200).json({ message: "Book deleted successfully" });
   } catch (error) {
     console.error("Error in deleteBook controller", error);
