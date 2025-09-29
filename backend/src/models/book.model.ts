@@ -8,7 +8,7 @@ export interface IBook extends mongoose.Document {
   genre: string[];
   price: number;
   stock: number;
-  coverImage?: string;
+  coverImage?: { url: string; public_id: string };
 }
 
 const bookSchema = new mongoose.Schema(
@@ -21,7 +21,10 @@ const bookSchema = new mongoose.Schema(
     genre: { type: [String], required: true },
     price: { type: Number, required: true, min: 0 },
     stock: { type: Number, required: true, default: 0, min: 0 },
-    coverImage: { type: String },
+    coverImage: { 
+      url: { type: String, required: false },
+      public_id: { type: String, required: false }
+     },
   },
   { timestamps: true }
 );
