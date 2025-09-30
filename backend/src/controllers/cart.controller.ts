@@ -135,7 +135,7 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    const itemIndex = cart.items.findIndex(item => item.book.toString() === bookId);
+    const itemIndex = cart.items.findIndex(item => item.book.equals(bookId));
     if (itemIndex === -1) {
       return res.status(404).json({ message: "Item not found in cart" });
     }
