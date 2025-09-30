@@ -76,7 +76,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
     const {bookId} = req.params;
     const {quantity} = req.body;
 
-    if(!bookId || !quantity){
+    if(!bookId || quantity === undefined){
       return res.status(400).json({message:"bookId and quantity are required"});
     }
     //Validate book exists and has sufficient stock
@@ -100,7 +100,7 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({message:"Cart not found"});
     }
 
-    const itemIndex = cart.items.findIndex(item => item.book.toString() === bookId);
+    const itemIndex = cart.items.findIndex(item => item.book.equals(bookId));
     if(itemIndex === -1){
       return res.status(404).json({message:"Item not found in cart"});
     }
