@@ -7,7 +7,7 @@ import {createOrder,getAllOrders, getUserOrders,getOrderById,updateOrderStatus,u
 import { adminRoute, authMiddleware } from '../middlewares/auth.middleware.js';
 
 router.post('/', authMiddleware, createOrder);
-router.get('/', authMiddleware, getAllOrders);
+router.get('/', authMiddleware,adminRoute, getAllOrders);
 router.get('/my-orders', authMiddleware, getUserOrders);
 router.get('/:orderId', authMiddleware,adminRoute, getOrderById);
 router.put('/:orderId/status', authMiddleware,adminRoute, updateOrderStatus);
