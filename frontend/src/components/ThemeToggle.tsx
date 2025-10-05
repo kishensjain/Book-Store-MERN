@@ -8,7 +8,7 @@ const ThemeToggle = () => {
   return (
     <button
       onClick={handleToggle}
-      className="flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:scale-100 active:scale-95 shadow-md border border-gray-300 bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-700"
+      className="flex items-center justify-center w-10 h-10 rounded-xl transition-all duration-300 hover:scale-100 active:scale-95 shadow-md bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-200hover:bg-gray-200 dark:hover:bg-gray-700"
       aria-label="Toggle Theme"
     >
       {mode === "light" ? (
