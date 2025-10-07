@@ -1,6 +1,8 @@
 import { useEffect } from "react";
 import { useAppSelector } from "./app/hooks"
-import ThemeToggle from "./components/ThemeToggle";
+import { Route, Routes } from "react-router";
+import Register from "./pages/Register";
+import Login from "./pages/Login";
 
 function App() {
   const theme = useAppSelector((s) => s.theme.mode);
@@ -16,8 +18,10 @@ function App() {
 
   return (
     <div className="min-h-screen bg-white dark:bg-slate-900">
-      {/* routes here later */}
-      <ThemeToggle/>
+      <Routes>
+        <Route path = '/register' element={<Register/>} />
+        <Route path = '/login' element={<Login/>} />
+      </Routes>
     </div>
   )
 }
