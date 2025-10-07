@@ -1,13 +1,15 @@
 import {createAsyncThunk,createSlice,type PayloadAction} from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
+interface User {
+  _id: string;
+  name: string;
+  email: string;
+  isAdmin: boolean;
+}
+
 interface AuthState {
-  user: null | {
-    _id: string;
-    name: string;
-    email: string;
-    isAdmin: boolean;
-  };
+  user: User | null,
   accessToken: string | null;
   refreshToken: string | null;
   loading: boolean; // for async API calls
