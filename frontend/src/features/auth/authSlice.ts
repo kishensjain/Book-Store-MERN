@@ -1,4 +1,8 @@
-import {createAsyncThunk,createSlice,type PayloadAction} from "@reduxjs/toolkit";
+import {
+  createAsyncThunk,
+  createSlice,
+  type PayloadAction,
+} from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
 interface User {
@@ -9,9 +13,8 @@ interface User {
 }
 
 interface AuthState {
-  user: User | null,
+  user: User | null;
   accessToken: string | null;
-  refreshToken: string | null;
   loading: boolean; // for async API calls
   error: string | null;
 }
@@ -19,7 +22,6 @@ interface AuthState {
 const initialState: AuthState = {
   user: null,
   accessToken: null,
-  refreshToken: null,
   loading: false,
   error: null,
 };
@@ -76,7 +78,6 @@ const slice = createSlice({
     logout(state) {
       state.user = null;
       state.accessToken = null;
-      state.refreshToken = null;
       state.error = null;
       state.loading = false;
     },
@@ -87,13 +88,12 @@ const slice = createSlice({
         state.loading = true;
         state.error = null;
       })
-      .addCase(loginUser.fulfilled, (state, action : PayloadAction<any>) => {
+      .addCase(loginUser.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
-        state.refreshToken = action.payload.refreshToken;
       })
-      .addCase(loginUser.rejected, (state, action:PayloadAction<any>) => {
+      .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
       })
@@ -105,13 +105,12 @@ const slice = createSlice({
         state.loading = false;
         state.user = action.payload.user;
         state.accessToken = action.payload.accessToken;
-        state.refreshToken = action.payload.refreshToken;
       })
       .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
         state.loading = false;
         state.error = action.payload;
-      })
-  }
+      });
+  },
 });
 
 export const { logout } = slice.actions;
