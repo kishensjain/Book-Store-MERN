@@ -5,18 +5,32 @@ import {
 } from "@reduxjs/toolkit";
 import api from "../../api/axios";
 
-interface User {
+export interface User {
   _id: string;
   name: string;
   email: string;
   isAdmin: boolean;
 }
 
-interface AuthState {
+export interface AuthState {
   user: User | null;
   accessToken: string | null;
   loading: boolean; // for async API calls
   error: string | null;
+}
+
+export interface AuthResponse {
+  user: User;
+  accessToken: string;
+}
+
+export interface LoginCredentials {
+  email: string;
+  password: string;
+}
+
+export interface RegisterCredentials extends LoginCredentials {
+  name: string;
 }
 
 const initialState: AuthState = {
@@ -26,7 +40,11 @@ const initialState: AuthState = {
   error: null,
 };
 
-export const loginUser = createAsyncThunk(
+export const loginUser = createAsyncThunk<
+  AuthResponse, // ✅ return type
+  LoginCredentials, // ✅ argument type
+  { rejectValue: string } // ✅ rejection type
+>(
   "auth/loginUser",
   async (credentials: { email: string; password: string }, thunkApi) => {
     try {
@@ -36,11 +54,19 @@ export const loginUser = createAsyncThunk(
       return thunkApi.rejectWithValue(
         error.response?.data?.message || "Login Failed"
       );
+
+      //If you just throw new Error(), action.payload will be undefined and the error is in action.error.
+
+      //Using rejectWithValue + rejectValue type ensures your reducer can safely read the payload without type assertions.
     }
   }
 );
 
-export const registerUser = createAsyncThunk(
+export const registerUser = createAsyncThunk<
+  AuthResponse,
+  RegisterCredentials,
+  { rejectValue: string }
+>(
   "auth/registerUser",
   async (
     credentials: { name: string; email: string; password: string },
@@ -82,7 +108,10 @@ const slice = createSlice({
       state.loading = false;
     },
   },
+
+  //extraReducers is where your thunks connect to the slice state
   extraReducers: (builder) => {
+    //builder is an object provided by Redux Toolkit to add reducers for actions generated outside of your slice (like async thunks).
     builder
       .addCase(loginUser.pending, (state) => {
         state.loading = true;
