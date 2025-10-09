@@ -3,7 +3,7 @@ import { useAppSelector,useAppDispatch } from "../app/hooks";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { loginUser } from "../features/auth/authSlice";
-
+import { Loader } from "lucide-react";
 
 interface LoginFormInputs{
   email:string,
@@ -86,7 +86,7 @@ const Login = () => {
             disabled={loading}
             className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
           >
-            {loading ? "Logiging in..." : "Login"}
+            {loading ? <Loader className="w-5 h-5 animate-spin inline-block "/> : "Login"}
           </button>
           <p className="mt-4 text-sm text-center text-gray-600 dark:text-gray-300">
           Don't have an account?{" "}

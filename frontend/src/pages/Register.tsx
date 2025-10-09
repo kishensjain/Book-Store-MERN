@@ -3,7 +3,7 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { registerUser } from "../features/auth/authSlice";
 import { useEffect } from "react";
 import { useNavigate, Link } from "react-router";
-
+import { Loader } from "lucide-react";
 interface RegisterFormInputs {
   name: string;
   email: string;
@@ -102,7 +102,7 @@ const Register = () => {
             disabled={loading}
             className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
           >
-            {loading ? "Registering..." : "Register"}
+            {loading ? <Loader className="w-5 h-5 animate-spin inline-block"/>: "Register"}
           </button>
         </form>
 
