@@ -118,3 +118,42 @@ const Register = () => {
 };
 
 export default Register;
+
+/* 
+User types → React Hook Form tracks values → Validation checks → errors object updated
+          → Submit button clicked → handleSubmit runs → onSubmit(data)
+          → Redux dispatch(registerUser) → API call
+          → Redux updates loading/user/error
+          → UI reacts: button text, error messages, redirect
+
+*/
+
+/*
+Without ...:
+<input type="text" register="name" />
+
+
+This won’t work because register("name") returns an object of props like { onChange, onBlur, ref, name }.
+
+You can’t just put the object as a single prop; React doesn’t know what to do with it.
+
+With ... (spread syntax):
+<input type="text" {...register("name")} />
+
+
+The ... spreads all the properties of the object returned by register("name") into the <input> as individual props.
+
+Equivalent to writing:
+
+const props = register("name");
+<input type="text" onChange={props.onChange} onBlur={props.onBlur} ref={props.ref} name={props.name} />
+
+
+React Hook Form needs all these props to:
+
+Track the value of the input
+
+Trigger validation
+
+Manage errors
+*/
