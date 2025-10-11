@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useNavigate, Link, NavLink } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { logout } from "../features/auth/authSlice";
+import { logoutUser } from "../features/auth/authSlice";
 import ThemeToggle from "./ThemeToggle";
 import { UserRound } from "lucide-react";
 
@@ -19,7 +19,7 @@ const Navbar = () => {
   ];
 
   const confirmLogout = () => {
-    dispatch(logout());
+    dispatch(logoutUser());
     setShowLogoutModal(false);
     navigate("/");
   };
