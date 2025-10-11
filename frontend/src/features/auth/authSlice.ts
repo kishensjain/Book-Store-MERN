@@ -118,7 +118,7 @@ const slice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<any>) => {
-        console.log("Payload from backend:", action.payload);
+        // console.log("Payload from backend:", action.payload);
         state.loading = false;
         state.user = state.user = {
           _id: action.payload._id,
