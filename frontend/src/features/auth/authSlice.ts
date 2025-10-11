@@ -118,8 +118,14 @@ const slice = createSlice({
         state.error = null;
       })
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<any>) => {
+        console.log("Payload from backend:", action.payload);
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = state.user = {
+          _id: action.payload._id,
+          name: action.payload.name,
+          email: action.payload.email,
+          isAdmin: action.payload.isAdmin,
+  };
         state.accessToken = action.payload.accessToken;
       })
       .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
@@ -132,7 +138,12 @@ const slice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.user = action.payload.user;
+        state.user = state.user = {
+          _id: action.payload._id,
+          name: action.payload.name,
+          email: action.payload.email,
+          isAdmin: action.payload.isAdmin,
+  };
         state.accessToken = action.payload.accessToken;
       })
       .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
