@@ -3,7 +3,7 @@ import { useNavigate, Link, NavLink } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { logoutUser } from "../features/auth/authSlice";
 import ThemeToggle from "./ThemeToggle";
-import { UserRound } from "lucide-react";
+import { UserRound, Menu, X } from "lucide-react";
 
 const Navbar = () => {
   const [showLogoutModal, setShowLogoutModal] = useState(false);
@@ -44,7 +44,9 @@ const Navbar = () => {
                 to={item.path}
                 className={({ isActive }) =>
                   `text-gray-700 dark:text-gray-200 hover:text-blue-600 dark:hover:text-blue-400 transition ${
-                    isActive ? "font-semibold text-blue-600 dark:text-blue-400" : ""
+                    isActive
+                      ? "font-semibold text-blue-600 dark:text-blue-400"
+                      : ""
                   }`
                 }
               >
@@ -90,21 +92,14 @@ const Navbar = () => {
           {/* Hamburger Button (Mobile) */}
           <button
             onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            className="md:hidden text-gray-700 dark:text-gray-200 focus:outline-none"
+            className="md:hidden text-gray-700 dark:text-gray-200 focus:outline-none transition"
+            aria-label={isMobileMenuOpen ? "Close menu" : "Open menu"}
           >
-            <svg
-              className="w-6 h-6"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-            >
-              {isMobileMenuOpen ? (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              ) : (
-                <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
-              )}
-            </svg>
+            {isMobileMenuOpen ? (
+              <X className="w-6 h-6 transition-transform duration-200 rotate-90" />
+            ) : (
+              <Menu className="w-6 h-6 transition-transform duration-200 rotate-0" />
+            )}
           </button>
         </div>
 
@@ -119,17 +114,9 @@ const Navbar = () => {
             <button
               onClick={() => setIsMobileMenuOpen(false)}
               className="self-end text-gray-700 dark:text-gray-200 focus:outline-none"
+              aria-label="Close menu"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                className="w-6 h-6"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              <X className="w-6 h-6" />
             </button>
 
             {/* Navigation Links */}
@@ -140,7 +127,9 @@ const Navbar = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
                 className={({ isActive }) =>
                   `block text-gray-700 dark:text-gray-200 text-lg hover:text-blue-600 dark:hover:text-blue-400 transition ${
-                    isActive ? "font-semibold text-blue-600 dark:text-blue-400" : ""
+                    isActive
+                      ? "font-semibold text-blue-600 dark:text-blue-400"
+                      : ""
                   }`
                 }
               >
