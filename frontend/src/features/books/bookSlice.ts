@@ -25,7 +25,7 @@ const initialState: BooksState = {
   error: null,
 };
 
-export const fetchBooks = createAsyncThunk(
+export const fetchBooks = createAsyncThunk<Book[], void, {rejectValue :string}>(
   "books/fetchBooks",
   async (_, thunkApi) => {
     try {
@@ -40,7 +40,7 @@ export const fetchBooks = createAsyncThunk(
 );
 
 const slice = createSlice({
-  name: "book",
+  name: "books",
   initialState,
   reducers: {},
   extraReducers: (builder) => {
@@ -50,10 +50,12 @@ const slice = createSlice({
         state.error = null;
       })
       .addCase(fetchBooks.fulfilled, (state, action: PayloadAction<Book[]>) => {
-        (state.loading = false), (state.books = action.payload);
+        state.loading = false; 
+        state.books = action.payload;
       })
-      .addCase(fetchBooks.rejected, (state, action: PayloadAction<any>) => {
-        (state.loading = false), (state.error = action.payload);
+      .addCase(fetchBooks.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload || "Something went wrong";
       });
   },
 });
