@@ -39,6 +39,20 @@ export const fetchBooks = createAsyncThunk<Book[], void, {rejectValue :string}>(
   }
 );
 
+export const fetchBookById = createAsyncThunk<Book, string, {rejectValue:string}>(
+  "books/getchBookById",
+  async (id : string, thunkApi) => {
+    try {
+      const response = await api.get(`/books/${id}`);
+      return response.data;
+    } catch (error :any) {
+      return thunkApi.rejectWithValue(
+        error.response?.data.message || "Failed to fetch required book"
+      )
+    }
+  }
+)
+
 const slice = createSlice({
   name: "books",
   initialState,
