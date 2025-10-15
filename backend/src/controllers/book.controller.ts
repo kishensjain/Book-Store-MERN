@@ -30,8 +30,6 @@ export const getBookById = async (req: Request, res: Response) => {
 };
 
 export const createBook = async (req: Request, res: Response) => {
-  console.log("req.file:", req.file);
-  console.log("req.body:", req.body);
 
   const { title, description, author, publishedDate, genre, price, stock } =
     req.body;
