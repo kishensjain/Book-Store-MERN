@@ -9,8 +9,12 @@ const Books = () => {
   const { books, loading, error } = useAppSelector((state) => state.books);
 
   useEffect(() => {
-    dispatch(fetchBooks())
+    dispatch(fetchBooks());
   }, [dispatch]);
+
+  useEffect(() => {
+    console.log(books); // 👈 See what comes from API
+  }, [books]);  
 
   if (loading) {
     return (
@@ -41,7 +45,11 @@ const Books = () => {
             >
               {book.coverImage?.url ? (
                 <img
-                  src={book.coverImage.url}
+                  src={
+                    book.coverImage?.url?.startsWith("http")
+                      ? book.coverImage.url
+                      : `http://localhost:4000${book.coverImage?.url}`
+                  }
                   alt={book.title}
                   className="w-full h-48 object-cover rounded-md mb-3"
                 />
