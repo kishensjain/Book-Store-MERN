@@ -4,12 +4,13 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import api from "../../api/axios";
-import { type RootState } from "../../app/store";
+import type { RootState } from "../../app/store";
 interface Book {
   _id: string;
   title: string;
   author: string;
   price: number;
+  description:string,
   coverImage?: { url: string; public_id: string };
 }
 

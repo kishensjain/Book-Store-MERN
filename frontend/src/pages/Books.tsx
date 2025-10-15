@@ -1,8 +1,8 @@
 import { useEffect } from "react";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-
-import { Loader } from "lucide-react";
 import { fetchBooks } from "../features/books/bookSlice";
+import { Link } from "react-router";
+import { Loader } from "lucide-react";
 
 const Books = () => {
   const dispatch = useAppDispatch();
@@ -12,59 +12,51 @@ const Books = () => {
     dispatch(fetchBooks());
   }, [dispatch]);
 
-  useEffect(() => {
-    console.log(books); // 👈 See what comes from API
-  }, [books]);  
-
-  if (loading) {
+  if (loading)
     return (
-      <div className="flex justify-center items-center h-64">
-        <Loader className="animate-spin w-8 h-8 text-blue-600" />
+      <div className="flex justify-center items-center min-h-screen">
+        <Loader className="animate-spin w-8 h-8 text-blue-500" />
       </div>
     );
-  }
 
-  if (error) {
-    return <p className="text-red-500 text-center mt-4">{error}</p>;
-  }
+  if (error)
+    return <p className="text-center text-red-500 mt-10">{error}</p>;
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6 text-gray-900 dark:text-gray-100">
-        📚 Available Books
+      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100 mb-8 text-center">
+        📚 All Books
       </h1>
 
       {books.length === 0 ? (
-        <p className="text-gray-600 dark:text-gray-300">No books found.</p>
+        <p className="text-center text-gray-500 dark:text-gray-400">
+          No books available.
+        </p>
       ) : (
-        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
           {books.map((book) => (
-            <div
+            <Link
+              to={`/books/${book._id}`}
               key={book._id}
-              className="border rounded-lg p-4 shadow hover:shadow-md dark:border-gray-700 transition"
+              className="block bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 hover:shadow-xl transition"
             >
-              {book.coverImage?.url ? (
+              {book.coverImage && (
                 <img
-                  src={
-                    book.coverImage?.url?.startsWith("http")
-                      ? book.coverImage.url
-                      : `http://localhost:4000${book.coverImage?.url}`
-                  }
+                  src={book.coverImage.url}
                   alt={book.title}
-                  className="w-full h-48 object-cover rounded-md mb-3"
+                  className="w-full h-60 object-cover rounded-md mb-4"
                 />
-              ) : (
-                <div className="w-full h-48 bg-gray-200 dark:bg-gray-700 rounded-md mb-3" />
               )}
-
-              <h3 className="text-lg font-semibold text-gray-900 dark:text-gray-100">
+              <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">
                 {book.title}
-              </h3>
-              <p className="text-gray-600 dark:text-gray-300">{book.author}</p>
+              </h2>
+              <p className="text-gray-600 dark:text-gray-400 text-sm">
+                {book.author}
+              </p>
               <p className="text-blue-600 dark:text-blue-400 font-medium mt-2">
                 ₹{book.price}
               </p>
-            </div>
+            </Link>
           ))}
         </div>
       )}

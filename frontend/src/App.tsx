@@ -6,6 +6,7 @@ import Login from "./pages/Login";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home"
 import Books from "./pages/Books"
+import BookDetails from "./pages/BookDetails";
 function App() {
   const theme = useAppSelector((s) => s.theme.mode);
   
@@ -28,6 +29,8 @@ function App() {
         <Route path = '/login' element={<Login/>} />
 
         <Route path="/books" element={<Books/>} />
+        <Route path="/books/:id" element={<BookDetails />} />
+
       </Routes>
     </div>
   )
