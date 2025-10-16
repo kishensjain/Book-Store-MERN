@@ -37,12 +37,9 @@ Redux Toolkit renames it internally as caseReducers.
 
 slice.reducer exists automatically — Redux Toolkit creates it for you.
 It’s a single function that:
-
-Takes the current state and an action
-
-Looks up the corresponding reducer in caseReducers
-
-Applies Immer to produce a new state
+  Takes the current state and an action
+  Looks up the corresponding reducer in caseReducers
+  Applies Immer to produce a new state
 
 So even though you never wrote slice.reducer, it exists.
 */
