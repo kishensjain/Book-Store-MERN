@@ -46,7 +46,7 @@ export const loginUser = createAsyncThunk<
   { rejectValue: string } // ✅ rejection type
 >(
   "auth/loginUser",
-  async (credentials: { email: string; password: string }, thunkApi) => {
+  async (credentials: LoginCredentials, thunkApi) => {
     try {
       const response = await api.post("auth/login", credentials);
       return response.data;
@@ -69,7 +69,7 @@ export const registerUser = createAsyncThunk<
 >(
   "auth/registerUser",
   async (
-    credentials: { name: string; email: string; password: string },
+    credentials: RegisterCredentials,
     thunkApi
   ) => {
     try {
@@ -83,7 +83,7 @@ export const registerUser = createAsyncThunk<
   }
 );
 
-export const logoutUser = createAsyncThunk(
+export const logoutUser = createAsyncThunk<void, void, {rejectValue : string}>(
   "auth/logoutUser",
   async (_, thunkApi) => {
     try {
@@ -120,7 +120,7 @@ const slice = createSlice({
       .addCase(loginUser.fulfilled, (state, action: PayloadAction<any>) => {
         // console.log("Payload from backend:", action.payload);
         state.loading = false;
-        state.user = state.user = {
+        state.user = {
           _id: action.payload._id,
           name: action.payload.name,
           email: action.payload.email,
@@ -128,9 +128,9 @@ const slice = createSlice({
   };
         state.accessToken = action.payload.accessToken;
       })
-      .addCase(loginUser.rejected, (state, action: PayloadAction<any>) => {
+      .addCase(loginUser.rejected, (state, action: PayloadAction<string | undefined>) => {
         state.loading = false;
-        state.error = action.payload;
+        state.error = action.payload ?? null;
       })
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
@@ -138,7 +138,7 @@ const slice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action: PayloadAction<any>) => {
         state.loading = false;
-        state.user = state.user = {
+        state.user = {
           _id: action.payload._id,
           name: action.payload.name,
           email: action.payload.email,
@@ -146,9 +146,9 @@ const slice = createSlice({
   };
         state.accessToken = action.payload.accessToken;
       })
-      .addCase(registerUser.rejected, (state, action: PayloadAction<any>) => {
-        state.loading = false;
-        state.error = action.payload;
+      .addCase(registerUser.rejected, (state, action: PayloadAction<string | undefined>) => {
+        state.loading = false,
+        state.error = action.payload ?? null
       });
   },
 });

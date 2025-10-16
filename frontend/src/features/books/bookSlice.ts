@@ -29,9 +29,9 @@ const initialState: BooksState = {
 };
 
 export const fetchBooks = createAsyncThunk<
-  Book[],
-  void,
-  { rejectValue: string }
+  Book[],//return type
+  void,// argument type
+  { rejectValue: string } //rejection type
 >("books/fetchBooks", async (_, thunkApi) => {
   try {
     const response = await api.get("/books");
