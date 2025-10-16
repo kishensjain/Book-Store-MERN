@@ -4,7 +4,7 @@ import {
   type PayloadAction,
 } from "@reduxjs/toolkit";
 import api from "../../api/axios";
-import type { RootState } from "../../app/store";
+// import type { RootState } from "../../app/store";
 interface Book {
   _id: string;
   title: string;
@@ -47,7 +47,7 @@ export const fetchBookById = createAsyncThunk<
   Book,
   string,
   { rejectValue: string }
->("books/getchBookById", async (id: string, thunkApi) => {
+>("books/fetchBookById", async (id: string, thunkApi) => {
   try {
     const response = await api.get(`/books/${id}`);
     return response.data;
@@ -96,4 +96,4 @@ const slice = createSlice({
 });
 
 export default slice.reducer;
-export const selectSelectedBook = (state: RootState) => state.books.selectedBook;
+// export const selectSelectedBook = (state: RootState) => state.books.selectedBook;
