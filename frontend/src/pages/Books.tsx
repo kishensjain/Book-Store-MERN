@@ -44,7 +44,7 @@ const Books = () => {
                 <img
                   src={book.coverImage.url}
                   alt={book.title}
-                  className="w-full h-60 object-cover rounded-md mb-4"
+                  className="w-full h-60 object-contain rounded-md mb-4 bg-gray-100"
                 />
               )}
               <h2 className="text-lg font-semibold text-gray-800 dark:text-gray-200">

@@ -3,7 +3,6 @@ import { useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchBookById } from "../features/books/bookSlice";
 import { Loader } from "lucide-react";
-import { Link } from "react-router";
 
 const BookDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -30,26 +29,43 @@ const BookDetails = () => {
     return <p className="text-center text-gray-500 mt-10">Book not found.</p>;
 
   return (
-    <div className="max-w-3xl mx-auto p-6 bg-white dark:bg-gray-800 rounded-lg shadow-md mt-10">
-        <Link
-              to={`/books/${book._id}`}
-              key={book._id}
-              className="block bg-white dark:bg-gray-800 shadow-lg rounded-lg p-4 hover:shadow-xl transition"
-            >
-      {book.coverImage && (
-        <img
-          src={book.coverImage.url}
-          alt={book.title}
-          className="w-full h-80 object-cover rounded-lg mb-6"
-        />
-      )}
-      <h1 className="text-3xl font-bold text-gray-800 dark:text-gray-100">{book.title}</h1>
-      <p className="text-gray-600 dark:text-gray-300 mt-2">by {book.author}</p>
-      <p className="text-lg font-semibold text-blue-600 dark:text-blue-400 mt-4">
-        ₹{book.price}
-      </p>
-      <p className="text-gray-600 dark:text-gray-300 ">{book.description}</p>
-      </Link>
+    <div className="max-w-6xl mx-auto p-6">
+      <div className="flex flex-col md:flex-row gap-6">
+        {/* Left: Book Cover */}
+        <div className="flex-shrink-0 w-full md:w-1/3">
+          <img
+            src={book.coverImage?.url}
+            alt={book.title}
+            className="w-full h-96 object-contain rounded-md bg-gray-100 dark:bg-gray-700"
+          />
+        </div>
+
+        {/* Right: Details */}
+        <div className="flex-1 flex flex-col justify-between">
+          <div>
+            <h1 className="text-3xl text-gray-600 dark:text-gray-400 font-bold mb-2">{book.title}</h1>
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
+              by {book.author}
+            </p>
+            <p className="text-gray-700 dark:text-gray-300 mb-4">
+              {book.description || "No description available."}
+            </p>
+            <p className="text-blue-600 dark:text-blue-400 font-semibold text-lg">
+              ₹{book.price}
+            </p>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="mt-6 flex gap-4">
+            <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
+              Add to Cart
+            </button>
+            <button className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition">
+              Buy Now
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
   );
 };
