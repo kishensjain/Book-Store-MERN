@@ -43,7 +43,7 @@ const BookDetails = () => {
         {/* Right: Details */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
-            <h1 className="text-3xl text-gray-600 dark:text-gray-400 font-bold mb-2">{book.title}</h1>
+            <h1 className="text-3xl text-gray-600 dark:text-gray-300 font-bold mb-2">{book.title}</h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               by {book.author}
             </p>
