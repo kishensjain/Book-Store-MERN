@@ -28,18 +28,16 @@ const slice = createSlice({
         existingItem.quantity += action.payload.quantity;
         if (existingItem.quantity < 1) existingItem.quantity = 1;
       } else {
-  state.items.push({
-    ...action.payload,
-    quantity: Math.max(action.payload.quantity, 1), // ensure at least 1
-  });
-}
+        state.items.push({
+          ...action.payload,
+          quantity: Math.max(action.payload.quantity, 1), // ensure at least 1
+        });
+      }
     },
 
-    removeFromCart(state, action :PayloadAction<string>) {
-      const bookId = action.payload
-      const existingItem = state.items.find(
-        (item) => item.bookId === bookId
-      );
+    removeFromCart(state, action: PayloadAction<string>) {
+      const bookId = action.payload;
+      const existingItem = state.items.find((item) => item.bookId === bookId);
       if (existingItem) {
         state.items = state.items.filter(
           (cartItem) => cartItem.bookId !== bookId
@@ -52,7 +50,7 @@ const slice = createSlice({
         (item) => item.bookId === action.payload.bookId
       );
       if (existingItem) {
-        Object.assign(existingItem, action.payload)
+        Object.assign(existingItem, action.payload);
         if (existingItem.quantity < 1) existingItem.quantity = 1;
       }
     },
@@ -63,5 +61,6 @@ const slice = createSlice({
   },
 });
 
-export const {addToCart, removeFromCart, updateCart, clearCart} = slice.actions
-export default slice.reducer
+export const { addToCart, removeFromCart, updateCart, clearCart } =
+  slice.actions;
+export default slice.reducer;

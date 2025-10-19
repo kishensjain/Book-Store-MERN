@@ -26,7 +26,7 @@ const Register = () => {
   };
 
   useEffect(() => {
-    console.log("Current user: ", user)
+    // console.log("Current user: ", user)
     if (user) {
       navigate("/"); // redirect after successful registration
     }
