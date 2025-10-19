@@ -16,6 +16,7 @@ const Navbar = () => {
   const navItems = [
     { name: "🏠 Home", path: "/" },
     { name: "📚 Books", path: "/books" },
+    {name : "🛒 Cart", path : "/cart"}
   ];
 
   const confirmLogout = () => {

@@ -1,19 +1,46 @@
 import { useEffect } from "react";
-import { useParams } from "react-router";
+import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchBookById } from "../features/books/bookSlice";
 import { Loader } from "lucide-react";
+import { addToCart } from "../features/cart/cartSlice";
 
 const BookDetails = () => {
   const { id } = useParams<{ id: string }>();
   const dispatch = useAppDispatch();
-  const { selectedBook: book, loading, error } = useAppSelector((state) => state.books);
+  const {
+    selectedBook: book,
+    loading,
+    error,
+  } = useAppSelector((state) => state.books);
+  const navigate = useNavigate();
+  const { user } = useAppSelector((state) => state.auth);
+
+  const addItemToCart = () => {
+    if (!book) return;
+    if (!user) {
+      navigate("/login");
+      return;
+    }
+
+    dispatch(
+      addToCart({
+        bookId: book._id,
+        title: book.title,
+        price: book.price,
+        coverImage: book.coverImage?.url || "",
+        quantity: 1,
+      })
+    );
+  };
 
   useEffect(() => {
     if (id) {
       dispatch(fetchBookById(id));
     }
   }, [id, dispatch]);
+  useEffect(() => { window.scrollTo(0, 0); }, [id]);
+
 
   if (loading)
     return (
@@ -22,8 +49,7 @@ const BookDetails = () => {
       </div>
     );
 
-  if (error)
-    return <p className="text-center text-red-500 mt-10">{error}</p>;
+  if (error) return <p className="text-center text-red-500 mt-10">{error}</p>;
 
   if (!book)
     return <p className="text-center text-gray-500 mt-10">Book not found.</p>;
@@ -43,7 +69,9 @@ const BookDetails = () => {
         {/* Right: Details */}
         <div className="flex-1 flex flex-col justify-between">
           <div>
-            <h1 className="text-3xl text-gray-600 dark:text-gray-300 font-bold mb-2">{book.title}</h1>
+            <h1 className="text-3xl text-gray-600 dark:text-gray-300 font-bold mb-2">
+              {book.title}
+            </h1>
             <p className="text-gray-600 dark:text-gray-400 mb-4">
               by {book.author}
             </p>
@@ -57,9 +85,16 @@ const BookDetails = () => {
 
           {/* Action Buttons */}
           <div className="mt-6 flex gap-4">
-            <button className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition">
-              Add to Cart
-            </button>
+            {book && (
+              <button
+                onClick={addItemToCart}
+                disabled = {loading}
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+              >
+                Add to Cart
+              </button>
+            )}
+
             <button className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition">
               Buy Now
             </button>
@@ -71,4 +106,3 @@ const BookDetails = () => {
 };
 
 export default BookDetails;
-

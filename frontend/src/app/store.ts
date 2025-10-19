@@ -2,13 +2,13 @@ import { configureStore } from "@reduxjs/toolkit";
 import themeReducer from "../features/theme/themeSlice";
 import authReducer from "../features/auth/authSlice"
 import booksReducer from "../features/books/bookSlice"
-
+import cartReducer from "../features/cart/cartSlice"
 export const store = configureStore({
     reducer: {
         theme : themeReducer,
         auth : authReducer,
         books : booksReducer,
-
+        cart : cartReducer
     },
 });
 

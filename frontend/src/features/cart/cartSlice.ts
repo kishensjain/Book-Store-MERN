@@ -64,3 +64,4 @@ const slice = createSlice({
 });
 
 export const {addToCart, removeFromCart, updateCart, clearCart} = slice.actions
+export default slice.reducer

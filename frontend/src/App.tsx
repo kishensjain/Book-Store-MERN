@@ -7,6 +7,7 @@ import Navbar from "./components/Navbar";
 import Home from "./pages/Home"
 import Books from "./pages/Books"
 import BookDetails from "./pages/BookDetails";
+import Cart from "./pages/Cart";
 function App() {
   const theme = useAppSelector((s) => s.theme.mode);
   
@@ -30,6 +31,8 @@ function App() {
 
         <Route path="/books" element={<Books/>} />
         <Route path="/books/:id" element={<BookDetails />} />
+
+        <Route path="/cart" element={<Cart/>}/>
 
       </Routes>
     </div>
