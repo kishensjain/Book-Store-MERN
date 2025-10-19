@@ -1,5 +1,4 @@
 import { createSlice, type PayloadAction } from "@reduxjs/toolkit";
-import { act, Activity } from "react";
 
 export interface CartItem {
   bookId: string | null;
@@ -27,18 +26,23 @@ const slice = createSlice({
       );
       if (existingItem) {
         existingItem.quantity += action.payload.quantity;
+        if (existingItem.quantity < 1) existingItem.quantity = 1;
       } else {
-        state.items.push(action.payload);
-      }
+  state.items.push({
+    ...action.payload,
+    quantity: Math.max(action.payload.quantity, 1), // ensure at least 1
+  });
+}
     },
 
-    removeFromCart(state, action: PayloadAction<CartItem>) {
+    removeFromCart(state, action :PayloadAction<string>) {
+      const bookId = action.payload
       const existingItem = state.items.find(
-        (item) => item.bookId === action.payload.bookId
+        (item) => item.bookId === bookId
       );
       if (existingItem) {
         state.items = state.items.filter(
-          (cartItem) => cartItem.bookId !== action.payload.bookId
+          (cartItem) => cartItem.bookId !== bookId
         );
       }
     },
@@ -49,6 +53,7 @@ const slice = createSlice({
       );
       if (existingItem) {
         Object.assign(existingItem, action.payload)
+        if (existingItem.quantity < 1) existingItem.quantity = 1;
       }
     },
 
