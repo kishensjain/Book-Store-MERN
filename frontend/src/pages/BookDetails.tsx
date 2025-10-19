@@ -4,6 +4,7 @@ import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchBookById } from "../features/books/bookSlice";
 import { Loader } from "lucide-react";
 import { addToCart } from "../features/cart/cartSlice";
+import toast from "react-hot-toast";
 
 const BookDetails = () => {
   const { id } = useParams<{ id: string }>();
@@ -32,6 +33,7 @@ const BookDetails = () => {
         quantity: 1,
       })
     );
+    toast.success("Book added to cart");
   };
 
   useEffect(() => {
