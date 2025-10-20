@@ -1,9 +1,13 @@
 import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { removeFromCart, updateCart } from "../features/cart/cartSlice";
+import { removeFromCart, updateCart, clearCart } from "../features/cart/cartSlice";
 const Cart = () => {
   const dispatch = useAppDispatch();
   const { items } = useAppSelector((state) => state.cart);
+
+  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
+  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+
 
   if (items.length === 0) {
     return (
@@ -21,7 +25,7 @@ const Cart = () => {
 
   return (
     <div className="max-w-6xl mx-auto p-6">
-      <div className="  gap-6">
+      <div className="gap-6">
         {items.map((item) => (
           <div
             key={item.bookId}
@@ -58,18 +62,18 @@ const Cart = () => {
                       })
                     )
                   }
-                  className="px-2 py-1 text-gray-600 dark:text-gray-50 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="px-2 py-1 text-gray-600 dark:text-amber-50 hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
-                  −
+                  -
                 </button>
-                <span className="px-3 dark:text-gray-200">{item.quantity}</span>
+                <span className="px-3 dark:text-amber-50">{item.quantity}</span>
                 <button
                   onClick={() =>
                     dispatch(
                       updateCart({ ...item, quantity: item.quantity + 1 })
                     )
                   }
-                  className="px-2 py-1 text-gray-600 dark:text-gray-50 hover:bg-gray-200 dark:hover:bg-gray-700"
+                  className="px-2 py-1 text-gray-600 dark:text-amber-50 hover:bg-gray-200 dark:hover:bg-gray-700"
                 >
                   +
                 </button>
@@ -91,6 +95,37 @@ const Cart = () => {
           </div>
         ))}
       </div>
+      {/* Cart Summary */}
+<div className="mt-8 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
+  <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+    Cart Summary
+  </h2>
+  <div className="flex justify-between text-gray-700 dark:text-gray-300 mb-2">
+    <span>Total Items:</span>
+    <span>{totalItems}</span>
+  </div>
+  <div className="flex justify-between text-gray-700 dark:text-gray-300 font-medium mb-4">
+    <span>Total Price:</span>
+    <span>₹{totalPrice}</span>
+  </div>
+
+  <div className="flex justify-between items-center">
+    <button
+      onClick={() => dispatch(clearCart())}
+      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+    >
+      Clear Cart
+    </button>
+
+    <button
+      onClick={() => alert('Proceeding to checkout...')}
+      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+    >
+      Checkout
+    </button>
+  </div>
+</div>
+
     </div>
   );
 };
