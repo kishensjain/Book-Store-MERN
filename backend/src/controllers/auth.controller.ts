@@ -42,82 +42,89 @@ const setCookies = (res:Response, accessToken:string, refreshToken:string) => {
   });
 }
 
-export const registerUser = async (req: Request, res: Response) => {
+export const registerUserController = async (req: Request, res: Response) => {
   try {
     const { name, email, password } = req.body;
 
-    //check if user already exists
+    // Check if user already exists
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ message: "User already exists" });
     }
 
-    //create new user
+    // Create new user
     const user = (await User.create({ name, email, password })) as IUser;
 
+    // Generate tokens
     const { accessToken, refreshToken } = generateTokens(String(user._id));
-		await storeRefreshToken(String(user._id), refreshToken); //stores in redis
+    await storeRefreshToken(String(user._id), refreshToken);
 
+    // Set HTTP-only cookies (optional)
     setCookies(res, accessToken, refreshToken);
 
+    // Return payload matching frontend expectations
     res.status(201).json({
-      _id: user._id,
-      name: user.name,
-      email: user.email,
-      isAdmin: user.isAdmin,
-      accessToken,
-      refreshToken,
-    });
-  } catch (error : any) {
-    console.error("Error in registerUser controller", error);
-    res.status(500).json({ message: error.message });
-  }
-};
-
-export const loginUser = async (req: Request, res: Response) => {
-  try {
-    const { email, password } = req.body;
-
-    const user = await User.findOne({ email });
-    if (user && (await user.comparePassword(password))) {
-      const { accessToken, refreshToken } = generateTokens(String(user._id));
-
-      await storeRefreshToken(String(user._id), refreshToken);
-      setCookies(res, accessToken, refreshToken);
-
-      res.status(201).json({
+      user: {
         _id: user._id,
         name: user.name,
         email: user.email,
         isAdmin: user.isAdmin,
-        accessToken,
-        refreshToken,
-      });
-    } else {
-      res.status(401).json({ message: "Invalid email or password" });
-    }
-  } catch (error : any) {
-    console.error("Error in loginUser controller", error);
+      },
+      accessToken,
+      refreshToken,
+    });
+  } catch (error: any) {
+    console.error("Error in registerUserController:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
-export const logoutUser = async (req: Request, res: Response) => {
+export const loginUserController = async (req: Request, res: Response) => {
   try {
-    const refreshToken = req.cookies.refreshToken;
-    if(refreshToken){
-      const decoded = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as string);
-      await redis.del(`refreshToken:${(decoded as any).id}`);
+    const { email, password } = req.body;
+
+    // Find user
+    const user = await User.findOne({ email });
+    if (!user || !(await user.comparePassword(password))) {
+      return res.status(401).json({ message: "Invalid email or password" });
     }
 
-    res.clearCookie("accessToken");
-		res.clearCookie("refreshToken");
-		res.status(200).json({ message: "Logged out successfully" });
-  } catch (error:any) {
-    console.error("Error in logoutUser controller", error);
+    // Generate tokens
+    const { accessToken, refreshToken } = generateTokens(String(user._id));
+    await storeRefreshToken(String(user._id), refreshToken);
+
+    // Set HTTP-only cookies (optional)
+    setCookies(res, accessToken, refreshToken);
+
+    // Return payload matching frontend expectations
+    res.status(200).json({
+      user: {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        isAdmin: user.isAdmin,
+      },
+      accessToken,
+      refreshToken,
+    });
+  } catch (error: any) {
+    console.error("Error in loginUserController:", error);
     res.status(500).json({ message: error.message });
   }
-}
+};
+export const logoutUserController = async (req: Request, res: Response) => {
+  try {
+
+    // Clear cookies
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
+
+    res.status(200).json({ message: "Logged out successfully" });
+  } catch (error: any) {
+    console.error("Error in logoutUserController:", error);
+    res.status(500).json({ message: error.message });
+  }
+};
 
 export const refreshAccessToken = async (req: Request, res: Response) => {
   try{
