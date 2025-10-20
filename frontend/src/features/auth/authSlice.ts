@@ -33,62 +33,71 @@ export interface RegisterCredentials extends LoginCredentials {
   name: string;
 }
 
+let parsedUser: User | null = null;
+try {
+  const savedUser = localStorage.getItem("user");
+  if (savedUser && savedUser !== "undefined") parsedUser = JSON.parse(savedUser);
+} catch (err) {
+  console.warn("Failed to parse user from localStorage", err);
+  parsedUser = null;
+}
+
 const initialState: AuthState = {
-  user: null,
-  accessToken: null,
+  user: parsedUser,
+  accessToken: localStorage.getItem("accessToken") || null,
   loading: false,
   error: null,
 };
+
+
+
 
 export const loginUser = createAsyncThunk<
   AuthResponse, // ✅ return type
   LoginCredentials, // ✅ argument type
   { rejectValue: string } // ✅ rejection type
->(
-  "auth/loginUser",
-  async (credentials: LoginCredentials, thunkApi) => {
-    try {
-      const response = await api.post("auth/login", credentials);
-      return response.data;
-    } catch (error: any) {
-      return thunkApi.rejectWithValue(
-        error.response?.data?.message || "Login Failed"
-      );
+>("auth/loginUser", async (credentials: LoginCredentials, thunkApi) => {
+  try {
+    const response = await api.post("auth/login", credentials);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+    localStorage.setItem("accessToken", response.data.accessToken);
+    return response.data;
+  } catch (error: any) {
+    return thunkApi.rejectWithValue(
+      error.response?.data?.message || "Login Failed"
+    );
 
-      //If you just throw new Error(), action.payload will be undefined and the error is in action.error.
+    //If you just throw new Error(), action.payload will be undefined and the error is in action.error.
 
-      //Using rejectWithValue + rejectValue type ensures your reducer can safely read the payload without type assertions.
-    }
+    //Using rejectWithValue + rejectValue type ensures your reducer can safely read the payload without type assertions.
   }
-);
+});
 
 export const registerUser = createAsyncThunk<
   AuthResponse,
   RegisterCredentials,
   { rejectValue: string }
->(
-  "auth/registerUser",
-  async (
-    credentials: RegisterCredentials,
-    thunkApi
-  ) => {
-    try {
-      const response = await api.post("auth/register", credentials);
-      return response.data;
-    } catch (error: any) {
-      return thunkApi.rejectWithValue(
-        error.response?.data?.message || "Registration Failed"
-      );
-    }
+>("auth/registerUser", async (credentials: RegisterCredentials, thunkApi) => {
+  try {
+    const response = await api.post("auth/login", credentials);
+    localStorage.setItem("user", JSON.stringify(response.data.user));
+    localStorage.setItem("accessToken", response.data.accessToken);
+    return response.data;
+  } catch (error: any) {
+    return thunkApi.rejectWithValue(
+      error.response?.data?.message || "Registration Failed"
+    );
   }
-);
+});
 
-export const logoutUser = createAsyncThunk<void, void, {rejectValue : string}>(
+export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
   "auth/logoutUser",
   async (_, thunkApi) => {
     try {
       await api.post("auth/logout");
       thunkApi.dispatch(logout());
+      localStorage.removeItem("user");
+      localStorage.removeItem("token");
     } catch (error: any) {
       return thunkApi.rejectWithValue(
         error.response?.data?.message || "Logout Failed"
@@ -125,13 +134,16 @@ const slice = createSlice({
           name: action.payload.name,
           email: action.payload.email,
           isAdmin: action.payload.isAdmin,
-  };
+        };
         state.accessToken = action.payload.accessToken;
       })
-      .addCase(loginUser.rejected, (state, action: PayloadAction<string | undefined>) => {
-        state.loading = false;
-        state.error = action.payload ?? null;
-      })
+      .addCase(
+        loginUser.rejected,
+        (state, action: PayloadAction<string | undefined>) => {
+          state.loading = false;
+          state.error = action.payload ?? null;
+        }
+      )
       .addCase(registerUser.pending, (state) => {
         state.loading = true;
         state.error = null;
@@ -143,13 +155,15 @@ const slice = createSlice({
           name: action.payload.name,
           email: action.payload.email,
           isAdmin: action.payload.isAdmin,
-  };
+        };
         state.accessToken = action.payload.accessToken;
       })
-      .addCase(registerUser.rejected, (state, action: PayloadAction<string | undefined>) => {
-        state.loading = false,
-        state.error = action.payload ?? null
-      });
+      .addCase(
+        registerUser.rejected,
+        (state, action: PayloadAction<string | undefined>) => {
+          (state.loading = false), (state.error = action.payload ?? null);
+        }
+      );
   },
 });
 

@@ -22,6 +22,7 @@ const Login = () => {
     };
 
   useEffect(() => {
+    console.log("Current user: ", user)
     if(user){
       navigate("/");
     }
