@@ -98,6 +98,7 @@ export const logoutUser = createAsyncThunk<void, void, { rejectValue: string }>(
       thunkApi.dispatch(logout());
       localStorage.removeItem("user");
       localStorage.removeItem("accessToken");
+      localStorage.removeItem("cart")
     } catch (error: any) {
       return thunkApi.rejectWithValue(
         error.response?.data?.message || "Logout Failed"

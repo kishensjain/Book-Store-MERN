@@ -59,7 +59,7 @@ export const registerUserController = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = generateTokens(String(user._id));
     await storeRefreshToken(String(user._id), refreshToken);
 
-    // Set HTTP-only cookies (optional)
+    // Set HTTP-only cookies
     setCookies(res, accessToken, refreshToken);
 
     // Return payload matching frontend expectations
@@ -93,7 +93,7 @@ export const loginUserController = async (req: Request, res: Response) => {
     const { accessToken, refreshToken } = generateTokens(String(user._id));
     await storeRefreshToken(String(user._id), refreshToken);
 
-    // Set HTTP-only cookies (optional)
+    // Set HTTP-only cookies
     setCookies(res, accessToken, refreshToken);
 
     // Return payload matching frontend expectations
