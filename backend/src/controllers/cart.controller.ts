@@ -32,7 +32,9 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
       return res.status(400).json({ message: "Insufficient stock" });
     }
 
-    const existingItem = cart.items.find((item) => item.book.toString() === bookId);
+    const existingItem = cart.items.find(
+      (item) => item.book.toString() === bookId
+    );
     if (existingItem) {
       existingItem.quantity += quantity;
       existingItem.price = book.price;
@@ -51,6 +53,8 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
       "title author price stock"
     );
     res.status(200).json(populatedCart);
+    console.log("🛒 Received addToCart request:", req.body);
+    console.log("User ID:", req.user?._id);
   } catch (error) {
     console.error("Error in addToCart:", error);
     res.status(500).json({ message: "Server error" });
@@ -59,10 +63,11 @@ export const addToCart = async (req: AuthRequest, res: Response) => {
 
 export const getCart = async (req: AuthRequest, res: Response) => {
   try {
-    const cart : ICart | null = await Cart.findOne({user:req.user?._id})
-      .populate("items.book", "title author price stock") ;
+    const cart: ICart | null = await Cart.findOne({
+      user: req.user?._id,
+    }).populate("items.book", "title author price stock");
     if (!cart) {
-      return res.status(200).json({ items:[],totalAmount:0});
+      return res.status(200).json({ items: [], totalAmount: 0 });
     }
     return res.status(200).json(cart);
   } catch (error) {
@@ -73,11 +78,13 @@ export const getCart = async (req: AuthRequest, res: Response) => {
 
 export const updateCartItem = async (req: AuthRequest, res: Response) => {
   try {
-    const {bookId} = req.params;
-    const {quantity} = req.body;
+    const { bookId } = req.params;
+    const { quantity } = req.body;
 
-    if(!bookId || quantity === undefined){
-      return res.status(400).json({message:"bookId and quantity are required"});
+    if (!bookId || quantity === undefined) {
+      return res
+        .status(400)
+        .json({ message: "bookId and quantity are required" });
     }
     //Validate book exists and has sufficient stock
     //Find user's cart
@@ -88,32 +95,35 @@ export const updateCartItem = async (req: AuthRequest, res: Response) => {
     //Save cart and return updated cart
 
     const book = await Book.findById(bookId);
-    if(!book){
-      return res.status(404).json({message:"Book not found"});
+    if (!book) {
+      return res.status(404).json({ message: "Book not found" });
     }
-    if(book.stock < quantity && quantity > 0){
-      return res.status(400).json({message:"Insufficient stock"});
-    }
-
-    const cart = await Cart.findOne({user:req.user?._id});
-    if(!cart){
-      return res.status(404).json({message:"Cart not found"});
+    if (book.stock < quantity && quantity > 0) {
+      return res.status(400).json({ message: "Insufficient stock" });
     }
 
-    const itemIndex = cart.items.findIndex(item => item.book.equals(bookId));
-    if(itemIndex === -1){
-      return res.status(404).json({message:"Item not found in cart"});
+    const cart = await Cart.findOne({ user: req.user?._id });
+    if (!cart) {
+      return res.status(404).json({ message: "Cart not found" });
     }
-    
-    if(quantity === 0){
-      cart.items.splice(itemIndex,1);
-    }else{
+
+    const itemIndex = cart.items.findIndex((item) => item.book.equals(bookId));
+    if (itemIndex === -1) {
+      return res.status(404).json({ message: "Item not found in cart" });
+    }
+
+    if (quantity === 0) {
+      cart.items.splice(itemIndex, 1);
+    } else {
       cart.items[itemIndex].quantity = quantity;
       cart.items[itemIndex].price = book.price;
     }
 
     await cart.save();
-    const populatedCart = await cart.populate("items.book","title author price stock");
+    const populatedCart = await cart.populate(
+      "items.book",
+      "title author price stock"
+    );
     return res.status(200).json(populatedCart);
   } catch (error) {
     console.error("Error in updateCartItem:", error);
@@ -135,7 +145,7 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ message: "Cart not found" });
     }
 
-    const itemIndex = cart.items.findIndex(item => item.book.equals(bookId));
+    const itemIndex = cart.items.findIndex((item) => item.book.equals(bookId));
     if (itemIndex === -1) {
       return res.status(404).json({ message: "Item not found in cart" });
     }
@@ -143,7 +153,10 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
     cart.items.splice(itemIndex, 1);
     await cart.save();
 
-    const populatedCart = await cart.populate("items.book", "title author price stock");
+    const populatedCart = await cart.populate(
+      "items.book",
+      "title author price stock"
+    );
     return res.status(200).json(populatedCart);
   } catch (error) {
     console.error("Error in removeCartItem:", error);
@@ -151,7 +164,7 @@ export const removeCartItem = async (req: AuthRequest, res: Response) => {
   }
 };
 
-export const  clearCart = async (req: AuthRequest, res: Response) => {
+export const clearCart = async (req: AuthRequest, res: Response) => {
   const userId = req.user?._id; //comes from auth middleware
 
   try {
