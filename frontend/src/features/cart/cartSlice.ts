@@ -94,6 +94,34 @@ export const clearCartBackend = createAsyncThunk<
   }
 });
 
+export const syncCart = createAsyncThunk<void, void, { rejectValue: string }>(
+  "cart/syncCart",
+  async (_, thunkApi) => {
+    try {
+      const state: any = thunkApi.getState();
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+
+      if (localCart.length > 0) {
+        // Send local items to backend
+        await Promise.all(
+          localCart.map((item: any) =>
+            api.post("/cart", item)
+          )
+        );
+        // After syncing, clear local storage
+        localStorage.removeItem("cart");
+      }
+
+      // Finally, fetch merged cart from backend
+      const response = await api.get("/cart");
+      thunkApi.dispatch(fetchCart.fulfilled(response.data, "cart/fetchCart", undefined));
+    } catch (error: any) {
+      return thunkApi.rejectWithValue(error.response?.data?.message || "Failed to sync cart");
+    }
+  }
+);
+
+
 const slice = createSlice({
   name: "cart",
   initialState,

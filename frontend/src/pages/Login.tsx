@@ -1,32 +1,41 @@
 import { useNavigate, Link } from "react-router";
-import { useAppSelector,useAppDispatch } from "../app/hooks";
+import { useAppSelector, useAppDispatch } from "../app/hooks";
 import { useForm } from "react-hook-form";
 import { useEffect } from "react";
 import { loginUser } from "../features/auth/authSlice";
 import { Loader } from "lucide-react";
+import { syncCart } from "../features/cart/cartSlice";
 
-interface LoginFormInputs{
-  email:string,
-  password:string,
+interface LoginFormInputs {
+  email: string;
+  password: string;
 }
 const Login = () => {
   const dispatch = useAppDispatch();
   const navigate = useNavigate();
 
-  const {user, loading, error} = useAppSelector((state) => state.auth);
+  const { user, loading, error } = useAppSelector((state) => state.auth);
 
-  const{register, handleSubmit, formState:{errors},} = useForm<LoginFormInputs>();
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<LoginFormInputs>();
 
-  const onSubmit = (data: LoginFormInputs) => {
-      dispatch(loginUser(data));
-    };
+  const onSubmit = async (data: LoginFormInputs) => {
+    const resultAction = await dispatch(loginUser(data));
+    if (loginUser.fulfilled.match(resultAction)) {
+      // login successful → sync cart with backend
+      dispatch(syncCart());
+    }
+  };
 
   useEffect(() => {
-    console.log("Current user: ", user)
-    if(user){
+    console.log("Current user: ", user);
+    if (user) {
       navigate("/");
     }
-  },[user]);
+  }, [user]);
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50 dark:bg-gray-900">
@@ -36,8 +45,6 @@ const Login = () => {
         </h2>
         {error && <p className="text-red-500 mb-4 text-center">{error}</p>}
         <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
-          
-
           <div>
             <label className="block mb-1 text-gray-700 dark:text-gray-200">
               Email
@@ -87,18 +94,22 @@ const Login = () => {
             disabled={loading}
             className="w-full py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 transition-colors disabled:opacity-50"
           >
-            {loading ? <Loader className="w-5 h-5 animate-spin inline-block "/> : "Login"}
+            {loading ? (
+              <Loader className="w-5 h-5 animate-spin inline-block " />
+            ) : (
+              "Login"
+            )}
           </button>
           <p className="mt-4 text-sm text-center text-gray-600 dark:text-gray-300">
-          Don't have an account?{" "}
-          <Link to="/register" className="text-indigo-600 hover:underline">
-            Signup
-          </Link>
-        </p>
+            Don't have an account?{" "}
+            <Link to="/register" className="text-indigo-600 hover:underline">
+              Signup
+            </Link>
+          </p>
         </form>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Login
+export default Login;

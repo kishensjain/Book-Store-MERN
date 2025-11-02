@@ -3,6 +3,7 @@ import {
   createSlice,
 } from "@reduxjs/toolkit";
 import api from "../../api/axios";
+import { syncCart } from "../cart/cartSlice";
 
 export interface User {
   _id: string;
