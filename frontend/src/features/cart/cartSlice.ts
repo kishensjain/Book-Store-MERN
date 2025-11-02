@@ -6,6 +6,7 @@ import {
 import api from "../../api/axios";
 
 export interface CartItem {
+  _id?: string;
   bookId: string;
   title: string;
   price: number;
@@ -39,7 +40,7 @@ export const fetchCart = createAsyncThunk<
 >("cart/fetchCart", async (_, thunkApi) => {
   try {
     const response = await api.get("/cart");
-    return response.data; // array of items
+    return response.data.items || []; // array of items
   } catch (error: any) {
     return thunkApi.rejectWithValue(
       error.response?.data?.message || "Failed to fetch cart"
@@ -53,8 +54,14 @@ export const addItemToCartBackend = createAsyncThunk<
   CartItem,
   { rejectValue: string }
 >("cart/addItemToCartBackend", async (bookDetails, thunkApi) => {
+  console.log("🟢 Sending request to backend with:", bookDetails);
   try {
-    const response = await api.post("/cart", bookDetails);
+    const response = await api.post("/cart", {
+      bookId: bookDetails.bookId,
+      quantity: bookDetails.quantity,
+    });
+    console.log("🟢 Backend response:", response.data);
+
     return response.data;
   } catch (error: any) {
     return thunkApi.rejectWithValue(
@@ -99,28 +106,33 @@ export const syncCart = createAsyncThunk<void, void, { rejectValue: string }>(
   async (_, thunkApi) => {
     try {
       const state: any = thunkApi.getState();
-      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      const localCart: CartItem[] = JSON.parse(
+        localStorage.getItem("cart") || "[]"
+      );
 
+      // If user is logged in, merge local items with backend
       if (localCart.length > 0) {
-        // Send local items to backend
-        await Promise.all(
-          localCart.map((item: any) =>
-            api.post("/cart", item)
-          )
-        );
-        // After syncing, clear local storage
+        await Promise.all(localCart.map((item) => api.post("/cart", item)));
+        // ✅ Clear local storage once synced
         localStorage.removeItem("cart");
       }
 
-      // Finally, fetch merged cart from backend
+      // ✅ Fetch the merged cart from backend (your getCart response)
       const response = await api.get("/cart");
-      thunkApi.dispatch(fetchCart.fulfilled(response.data, "cart/fetchCart", undefined));
+      const { items } = response.data;
+
+      // ✅ Update redux store directly
+      thunkApi.dispatch(
+        fetchCart.fulfilled(items, "cart/fetchCart", undefined)
+      );
     } catch (error: any) {
-      return thunkApi.rejectWithValue(error.response?.data?.message || "Failed to sync cart");
+      console.error("Error syncing cart:", error);
+      return thunkApi.rejectWithValue(
+        error.response?.data?.message || "Failed to sync cart"
+      );
     }
   }
 );
-
 
 const slice = createSlice({
   name: "cart",
@@ -179,9 +191,27 @@ const slice = createSlice({
       })
       .addCase(fetchCart.fulfilled, (state, action) => {
         state.loading = false;
-        state.items = action.payload;
-        saveCart(state);
+
+        const cartData = action.payload as any;
+        if (Array.isArray(cartData)) {
+          // Direct array (local fallback)
+          state.items = cartData;
+        } else if (cartData.items) {
+          // Backend response shape
+          state.items = cartData.items.map((item: any) => ({
+            bookId: item.book._id,
+            title: item.book.title,
+            price: item.book.price,
+            coverImage: item.book.coverImage?.url || "",
+            quantity: item.quantity,
+          }));  
+        } else {
+          state.items = [];
+        }
+
+        state.error = null;
       })
+
       .addCase(fetchCart.rejected, (state, action) => {
         state.loading = false;
         state.error = action.payload || "Failed to fetch cart";

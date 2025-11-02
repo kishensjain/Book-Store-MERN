@@ -62,7 +62,8 @@ export const loginUser = createAsyncThunk<
 
     localStorage.setItem("user", JSON.stringify(response.data.user));
     localStorage.setItem("accessToken", response.data.accessToken);
-
+    
+    thunkApi.dispatch(syncCart())
     return response.data;
   } catch (error: any) {
     return thunkApi.rejectWithValue(

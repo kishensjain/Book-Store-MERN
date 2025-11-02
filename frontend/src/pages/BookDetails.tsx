@@ -3,7 +3,7 @@ import { useNavigate, useParams } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
 import { fetchBookById } from "../features/books/bookSlice";
 import { Loader } from "lucide-react";
-import { addToCart } from "../features/cart/cartSlice";
+import { addToCart, addItemToCartBackend } from "../features/cart/cartSlice";
 import toast from "react-hot-toast";
 
 const BookDetails = () => {
@@ -24,15 +24,19 @@ const BookDetails = () => {
       return;
     }
 
-    dispatch(
-      addToCart({
-        bookId: book._id,
-        title: book.title,
-        price: book.price,
-        coverImage: book.coverImage?.url || "",
-        quantity: 1,
-      })
-    );
+    const bookData = {
+    bookId: book._id,
+    title: book.title,
+    price: book.price,
+    coverImage: book.coverImage?.url || "",
+    quantity: 1,
+  };
+
+  // 1️⃣ First, update local state for instant UI feedback
+  dispatch(addToCart(bookData));
+
+  // 2️⃣ Then, sync with backend
+  dispatch(addItemToCartBackend(bookData));
     toast.success("Book added to cart");
   };
 

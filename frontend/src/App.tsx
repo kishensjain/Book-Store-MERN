@@ -1,5 +1,5 @@
 import { useEffect } from "react";
-import { useAppSelector } from "./app/hooks"
+import { useAppDispatch, useAppSelector } from "./app/hooks"
 import { Route, Routes } from "react-router";
 import Register from "./pages/Register";
 import Login from "./pages/Login";
@@ -8,9 +8,23 @@ import Home from "./pages/Home"
 import Books from "./pages/Books"
 import BookDetails from "./pages/BookDetails";
 import Cart from "./pages/Cart";
+import { fetchCart, addToCart } from "./features/cart/cartSlice";
 function App() {
+  const dispatch = useAppDispatch();
+  const {user} = useAppSelector((state)=>state.auth)
   const theme = useAppSelector((s) => s.theme.mode);
   
+  useEffect(() => {
+    if (user) {
+      // 🔹 If logged in, get cart from backend
+      dispatch(fetchCart());
+    } else {
+      // 🔹 If guest, restore from local storage
+      const localCart = JSON.parse(localStorage.getItem("cart") || "[]");
+      localCart.forEach((item: any) => dispatch(addToCart(item)));
+    }
+  }, [user, dispatch]);
+
   useEffect(() => {
     const root = document.documentElement; //html tag
     if(theme === "dark"){

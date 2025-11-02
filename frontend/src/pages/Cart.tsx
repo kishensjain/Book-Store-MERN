@@ -1,12 +1,29 @@
 import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { removeFromCart, updateCart, clearCart } from "../features/cart/cartSlice";
+import {
+  removeFromCart,
+  updateCart,
+  clearCart,
+  fetchCart,
+  clearCartBackend,
+} from "../features/cart/cartSlice";
 const Cart = () => {
   const dispatch = useAppDispatch();
   const { items } = useAppSelector((state) => state.cart);
 
-  const totalItems = items.reduce((sum, item) => sum + item.quantity, 0);
-  const totalPrice = items.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const totalItems = items.reduce(
+    (sum, item) => sum + Number(item.quantity || 0),
+    0
+  );
+  const totalPrice = items.reduce(
+    (sum, item) => sum + Number(item.price || 0) * Number(item.quantity || 0),
+    0
+  );
+
+  const handleClearCart = async () => {
+  await dispatch(clearCartBackend());
+  await dispatch(fetchCart()); // 🔁 refetch to confirm cleared state
+};
 
 
   if (items.length === 0) {
@@ -28,7 +45,7 @@ const Cart = () => {
       <div className="gap-6">
         {items.map((item) => (
           <div
-            key={item.bookId}
+            key={item._id || item.bookId}
             className="flex flex-col md:flex-row items-center justify-between bg-white dark:bg-gray-900 rounded-lg shadow-md p-4 mb-4"
           >
             {/* Left: Cover + Details */}
@@ -96,36 +113,35 @@ const Cart = () => {
         ))}
       </div>
       {/* Cart Summary */}
-<div className="mt-8 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
-  <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
-    Cart Summary
-  </h2>
-  <div className="flex justify-between text-gray-700 dark:text-gray-300 mb-2">
-    <span>Total Items:</span>
-    <span>{totalItems}</span>
-  </div>
-  <div className="flex justify-between text-gray-700 dark:text-gray-300 font-medium mb-4">
-    <span>Total Price:</span>
-    <span>₹{totalPrice}</span>
-  </div>
+      <div className="mt-8 bg-white dark:bg-gray-900 p-6 rounded-lg shadow-md">
+        <h2 className="text-xl font-semibold text-gray-800 dark:text-gray-200 mb-4">
+          Cart Summary
+        </h2>
+        <div className="flex justify-between text-gray-700 dark:text-gray-300 mb-2">
+          <span>Total Items:</span>
+          <span>{totalItems}</span>
+        </div>
+        <div className="flex justify-between text-gray-700 dark:text-gray-300 font-medium mb-4">
+          <span>Total Price:</span>
+          <span>₹{totalPrice}</span>
+        </div>
 
-  <div className="flex justify-between items-center">
-    <button
-      onClick={() => dispatch(clearCart())}
-      className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
-    >
-      Clear Cart
-    </button>
+        <div className="flex justify-between items-center">
+          <button
+            onClick={handleClearCart}
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+          >
+            Clear Cart
+          </button>
 
-    <button
-      onClick={() => alert('Proceeding to checkout...')}
-      className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
-    >
-      Checkout
-    </button>
-  </div>
-</div>
-
+          <button
+            onClick={() => alert("Proceeding to checkout...")}
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+          >
+            Checkout
+          </button>
+        </div>
+      </div>
     </div>
   );
 };
