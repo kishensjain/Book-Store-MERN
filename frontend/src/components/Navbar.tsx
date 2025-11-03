@@ -34,7 +34,7 @@ const Navbar = () => {
             to="/"
             className="text-2xl font-bold text-blue-600 dark:text-blue-400"
           >
-            Book Store
+            Book Verse
           </Link>
 
           {/* Desktop Menu */}
