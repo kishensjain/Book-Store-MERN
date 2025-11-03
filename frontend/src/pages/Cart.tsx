@@ -129,14 +129,14 @@ const Cart = () => {
         <div className="flex justify-between items-center">
           <button
             onClick={handleClearCart}
-            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition"
+            className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition cursor-pointer"
           >
             Clear Cart
           </button>
 
           <button
             onClick={() => alert("Proceeding to checkout...")}
-            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+            className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition cursor-pointer"
           >
             Checkout
           </button>

@@ -95,13 +95,13 @@ const BookDetails = () => {
               <button
                 onClick={addItemToCart}
                 disabled = {loading}
-                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition"
+                className="px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition cursor-pointer"
               >
                 Add to Cart
               </button>
             )}
 
-            <button className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition">
+            <button className="px-4 py-2 bg-yellow-500 text-white rounded-md hover:bg-yellow-600 transition cursor-pointer">
               Buy Now
             </button>
           </div>

@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { Link } from "react-router";
 import { useAppDispatch, useAppSelector } from "../app/hooks";
-import { fetchBooks } from "../features/books/bookSlice"; // adjust import path
+import { fetchBooks } from "../features/books/bookSlice";
 
 const Home = () => {
   const dispatch = useAppDispatch();
