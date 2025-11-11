@@ -3,12 +3,14 @@ import themeReducer from "../features/theme/themeSlice";
 import authReducer from "../features/auth/authSlice"
 import booksReducer from "../features/books/bookSlice"
 import cartReducer from "../features/cart/cartSlice"
+import ordersReducer from "../features/order/orderSlice"
 export const store = configureStore({
     reducer: {
         theme : themeReducer,
         auth : authReducer,
         books : booksReducer,
-        cart : cartReducer
+        cart : cartReducer,
+        orders : ordersReducer,
     },
 });
 

@@ -67,7 +67,7 @@ const Home = () => {
               </Link>
             </div>
           ))}
-        </div>
+        </div>  
       </section>
     </div>
   );

@@ -9,6 +9,7 @@ import Books from "./pages/Books"
 import BookDetails from "./pages/BookDetails";
 import Cart from "./pages/Cart";
 import { fetchCart, addToCart } from "./features/cart/cartSlice";
+import Profile from "./pages/Profile";
 function App() {
   const dispatch = useAppDispatch();
   const {user} = useAppSelector((state)=>state.auth)
@@ -45,6 +46,8 @@ function App() {
 
         <Route path="/books" element={<Books/>} />
         <Route path="/books/:id" element={<BookDetails />} />
+
+        <Route path="/profile" element={<Profile />} />
 
         <Route path="/cart" element={<Cart/>}/>
 
