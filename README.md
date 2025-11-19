@@ -67,4 +67,4 @@ Below is the architecture diagram used in this project:
 
 ---
 
-#Open to suggestions and improvements😊
+# Open to suggestions and improvements😊
