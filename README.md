@@ -66,3 +66,5 @@ Below is the architecture diagram used in this project:
 | Dev Tools | Nodemon, ts-node-dev |
 
 ---
+
+#Open to suggestions and improvements😊
